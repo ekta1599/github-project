@@ -14,3 +14,28 @@ exports.add = async (req, res) => {
         return response(err.message, err?.error, err.status, res);
     }
 };
+exports.update = async (req, res) => {
+    try {
+        let resp = await service.update(req.params._id, req.body);
+        if (resp) {
+            return response("data updated successfully!!", resp.data, 200, res);
+        } else {
+            return response("something went wrong!!", {}, 500, res);
+        }
+
+    } catch (err) {
+        return response(err.message, err?.error, err.status, res);
+    }
+};
+exports.delete = async (req, res) => {
+    try {
+        let resp = await service.delete(req.params._id);
+        if (resp) {
+            return response("Deleted successfully!!", resp.data, 200, res);
+        } else {
+            return response("Error..!!", err.error, err.status, res);
+        }
+    } catch (err) {
+        return response(err.message, err?.error, err.status, res);
+    }
+};
