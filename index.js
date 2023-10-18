@@ -2,6 +2,8 @@ const express = require('express')
 const mongoose = require('mongoose')
 const path = require('path')
 const app = express()
+var cors = require('cors')
+const morgan = require("morgan");
 
 const v1 = require('./v1')
 require('dotenv').config({ path : path.join(__dirname, './config/.env')})
