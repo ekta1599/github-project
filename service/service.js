@@ -59,15 +59,10 @@ module.exports = {
             }
         });
     },
-    getAll: (page, limit, str) => {
+    getAll: () => {
         return new Promise(async (res, rej) => {
           try {
-            let qry = {};
-            page = parseInt(page);
-            limit = parseInt(limit);
-            // if (str) {
-            //   qry["$or"] = [{ name: { $regex: str, $options: "i" } }];
-            // }
+           
             let getData = await gitmodel.aggregate([
             //   { $match: qry },
               {
@@ -86,9 +81,7 @@ module.exports = {
                         __v: 0,
                       },
                     },
-                    { $sort: { createdAt: -1 } },
-                    { $skip: (page - 1) * limit },
-                    { $limit: limit },
+                    
                   ],
                 },
               },
