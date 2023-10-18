@@ -4,11 +4,11 @@ module.exports = {
         return new Promise(async (res, rej) => {
             try {
                 let saveData = await gitmodel.create(data)
-                console.log("savedata", saveData);
+                 console.log("savedata", saveData);
                 if (saveData) {
                     res({ status: 200, data: saveData });
                 } else {
-                    rej({ status: 500, message: "something went wrong!!" });
+                    rej({ status: 404, message: "something went wrong!!" });
                 }
             } catch (err) {
                 rej({ status: 500, error: err, message: "something went wrong!!" });
