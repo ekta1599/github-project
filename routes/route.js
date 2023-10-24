@@ -3,14 +3,23 @@ const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const route = router()
 const controller = require('../controller/controller')
+const usercontroller = require('../controller/userdetail')
 const {response} = require('../middleware/response')
 const UserModel = require('../model/User')
 const auth = require('../middleware/auth')
+
 route.post('/add',controller.add)
 route.put("/update/:_id", controller.update)
 route.delete('/delete/:_id', controller.delete)
 route.get('/getbyId/:_id',controller.byId)
 route.get('/getAll',controller.getAll)
+//user routes
+route.get('/getAlluser',usercontroller.getAll)
+route.post('/adduser',usercontroller.add)
+route.get('/getUserbyId/:_id',usercontroller.getbyId)
+route.put('/updateuser/:_id',usercontroller.update)
+
+//login && registration
 route.post("/register", async (req, res) => {
     try {
       const { first_name, last_name, email, password } = req.body;
