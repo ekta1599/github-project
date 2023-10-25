@@ -14,7 +14,7 @@ route.delete('/delete/:_id', controller.delete)
 route.get('/getbyId/:_id',controller.byId)
 route.get('/getAll',controller.getAll)
 //user routes
-route.get('/getAlluser',usercontroller.getAll)
+route.get('/getAlluser',auth,usercontroller.getAll)
 route.post('/adduser',usercontroller.add)
 route.get('/getUserbyId/:_id',usercontroller.getbyId)
 route.put('/updateuser/:_id',usercontroller.update)
@@ -93,6 +93,7 @@ route.post("/login", async (req, res) => {
     }
   
   });
+
   route.post("/welcome", auth, (req, res) => {
     res.status(200).send("Welcome 🙌 ");
   });
