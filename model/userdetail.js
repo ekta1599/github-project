@@ -1,7 +1,10 @@
-const { Schema, model } = require('mongoose')
+const { Schema, model, Types } = require('mongoose')
 
 let UserdetailModel = new Schema(
     {
+        userId:{
+            type:Types.ObjectId
+        },
         first_name: {
             type: String,
             default: null,
