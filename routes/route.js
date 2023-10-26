@@ -64,8 +64,8 @@ route.post("/register", async (req, res) => {
 route.post("/login", async (req, res) => {
     try {
      
-      const { email, password } = req.decoded;
-      // const { email, password } = req.body;
+      // const { email, password } = req.decoded;
+      const { email, password } = req.body;
   
       if (!(email && password)) {
         res.status(400).send("All input is required");
