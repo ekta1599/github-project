@@ -3,7 +3,7 @@ const {response} = require('../middleware/response')
 
 exports.add = async (req, res) => {
   try {
-      let resp = await userservice.add(req.body);
+      let resp = await userservice.add(req);
       if (resp) {
           return response("Success!!", {}, 200, res);
       } else {
@@ -18,7 +18,7 @@ exports.getAll = async (req, res) => {
         if (!req.query.page || !req.query.limit) {
             return response("pagination is require for pagination..!!", {}, 404, res);
         }
-        let resp = await userservice.getAll(req.query.page, req.query.limit);
+        let resp = await userservice.getAll(req);
         if (resp) {
           return response("SUCCESS..!!", resp.data, 200, res);
         } else return response("Error..!!", err.error, err.status, res);

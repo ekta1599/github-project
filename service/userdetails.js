@@ -1,34 +1,54 @@
 const UserdetailModel = require('../model/userdetail')
+const UserModel = require('../model/User')
+var Mongoose = require('mongoose');
 
 module.exports = {
-    add: (data) => {
+    add: (req) => {
         return new Promise(async (res, rej) => {
             try {
-                let saveData = await UserdetailModel.create(data)
+                let { first_name, last_name, age, contactNo, country } = req.body
+
+                let userId = req.user.user_id
+
+                let saveData = await UserdetailModel.create({
+                    first_name,
+                    last_name,
+                    age,
+                    contactNo,
+                    country,
+                    userId
+                })
                 if (saveData) {
                     res({ status: 200, data: "New Data added!!" });
                 } else {
                     rej({ status: 500, message: "something went wrong!!" });
                 }
             } catch (err) {
-                console.log("err",err);
+                console.log("err", err);
                 rej({ status: 500, error: err, message: "something went wrong!!" });
             }
         })
     },
-    getAll: (page, limit, str) => {
+    getAll: (req) => {
         return new Promise(async (res, rej) => {
+            console.log("req", req.user.user_id);
+            const userId = req.user.user_id
+            // console.log("email", email);
+
             try {
+                let getData;
                 let qry = {};
+                let { page, limit } = req.query
                 page = parseInt(page);
                 limit = parseInt(limit);
-                // if (str) {
-                //     qry['$or'] = [
-                //         { "name": { $regex: str, $options: 'i' } },
-                //     ]
-                // }
-                let getData = await UserdetailModel.aggregate([
-                    // { $match: qry },
+
+                // let userdata = await UserModel.findOne({ "email": email })
+                // console.log("userdata", userdata);
+                // if (!userdata) {
+                //     rej({ status: 404, message: "No data found!!" })
+                // } else {
+                getData = await UserdetailModel.aggregate([
+                    { $match: { userId:new Mongoose.Types.ObjectId(userId) } },
                     {
                         $facet: {
                             total_count: [
@@ -52,6 +72,7 @@ module.exports = {
                         }
                     },
                 ]);
+                // }
                 getData = getData[0]
                 if (getData.result.length > 0) {
                     res({ status: 200, data: { total_count: getData.total_count[0].count, result: getData.result } });
@@ -61,7 +82,7 @@ module.exports = {
                 }
             }
             catch (err) {
-                // console.log(err)
+                console.log(err)
                 rej({ status: 500, error: err, message: "something went wrong!!" });
             }
         });

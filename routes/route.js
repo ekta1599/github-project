@@ -15,7 +15,7 @@ route.get('/getbyId/:_id',controller.byId)
 route.get('/getAll',controller.getAll)
 //user routes
 route.get('/getAlluser',auth,usercontroller.getAll)
-route.post('/adduser',usercontroller.add)
+route.post('/adduser',auth,usercontroller.add)
 route.get('/getUserbyId/:_id',usercontroller.getbyId)
 route.put('/updateuser/:_id',usercontroller.update)
 
@@ -64,7 +64,8 @@ route.post("/register", async (req, res) => {
 route.post("/login", async (req, res) => {
     try {
      
-      const { email, password } = req.body;
+      const { email, password } = req.decoded;
+      // const { email, password } = req.body;
   
       if (!(email && password)) {
         res.status(400).send("All input is required");
