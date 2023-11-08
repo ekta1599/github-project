@@ -47,7 +47,7 @@ module.exports = {
         return new Promise(async (res, rej) => {
             try {
                 let saveData = await gitmodel.findOne({ _id });
-                console.log("saveData--->", saveData)
+                // console.log("saveData--->", saveData)
                 if (saveData) {
                     res({ status: 200, data: saveData });
                 } else {

@@ -4,9 +4,14 @@ const jwt = require("jsonwebtoken");
 const route = router()
 const controller = require('../controller/controller')
 const usercontroller = require('../controller/userdetail')
+const productController = require('../controller/product.js')
 const {response} = require('../middleware/response')
 const UserModel = require('../model/User')
 const auth = require('../middleware/auth')
+
+route.get("/", (req, res) => {
+  res.status(200).json({ message: "ProductRoute is working" });
+});
 
 route.post('/add',controller.add)
 route.put("/update/:_id", controller.update)
@@ -19,6 +24,12 @@ route.post('/adduser',auth,usercontroller.add)
 route.get('/getUserbyId/:_id',usercontroller.getbyId)
 route.put('/updateuser/:_id',usercontroller.update)
 
+//product routes :-
+route.post('/addProduct',auth,productController.AddProduct)
+route.get('/getAllProducts',productController.getAllProducts)
+route.get('/getProductBYId/:_id',productController.getProductBYId)
+route.delete('/delteProductByID/:_id',productController.deleteProductByID)
+route.get('/getAllSearch',auth,productController.getAllSearch)
 //login && registration
 route.post("/register", async (req, res) => {
     try {

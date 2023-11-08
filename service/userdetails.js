@@ -4,6 +4,7 @@ var Mongoose = require('mongoose');
 
 module.exports = {
     add: (req) => {
+        // console.log("req,",req);
         return new Promise(async (res, rej) => {
             try {
                 let { first_name, last_name, age, contactNo, country } = req.body
@@ -105,7 +106,7 @@ module.exports = {
         return new Promise(async (res, rej) => {
             try {
                 let saveData = await UserdetailModel.findOne({ _id });
-                console.log("saveData--->", saveData)
+                // console.log("saveData--->", saveData)
                 if (saveData) {
                     res({ status: 200, data: saveData });
                 } else {

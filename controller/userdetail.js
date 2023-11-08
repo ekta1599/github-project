@@ -2,6 +2,7 @@ const userservice = require('../service/userdetails')
 const {response} = require('../middleware/response')
 
 exports.add = async (req, res) => {
+  console.log('req',req);
   try {
       let resp = await userservice.add(req);
       if (resp) {
