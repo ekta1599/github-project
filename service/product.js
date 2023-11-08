@@ -7,7 +7,7 @@ module.exports = {
         return new Promise(async (res, rej) => {
             try {
                 let { productImage, productTitle, Price, Weight } = req.body
-                 console.log("productImage",productImage);
+                console.log("productImage", productImage);
                 let userId = req.user.user_id
 
                 let saveData = await ProductModel.create({
@@ -116,69 +116,82 @@ module.exports = {
             }
         })
     },
-    getAllSearch : async (req) => {
+    getAllSearch: async (req) => {
         return new Promise(async (res, rej) => {
             try {
                 let userID = req.user.user_id;
 
-                let {page, limit, str} = req.query
-                console.log("str",str);
-              let qry = {};
-              qry.userId = new Mongoose.Types.ObjectId(userID)
-              page = parseInt(page);
-              limit = parseInt(limit);
-            //   if (str) {
-            //     qry['Is_fav'] = { $regex: str, $options: "i" };
-            //   }
-            //   if (str !== undefined) {
+                let { page, limit, str } = req.query
+                console.log("str", str);
+                let qry = {};
+                qry.userId = new Mongoose.Types.ObjectId(userID)
+                page = parseInt(page);
+                limit = parseInt(limit);
+                //   if (str) {
+                //     qry['Is_fav'] = { $regex: str, $options: "i" };
+                //   }
+                //   if (str !== undefined) {
                 qry.Is_fav = true;
-            //   }
-             console.log("qry..............",qry);
-              let getData = await ProductModel.aggregate([
-                { $match: qry },
-                // {$match : {'userId': new Mongoose.Types.ObjectId(userID)}},
-                {
-                  $facet: {
-                    total_count: [
-                      {
-                        $group: {
-                          _id: null,
-                          count: { $sum: 1 },
+                //   }
+                console.log("qry..............", qry);
+                let getData = await ProductModel.aggregate([
+                    { $match: qry },
+                    // {$match : {'userId': new Mongoose.Types.ObjectId(userID)}},
+                    {
+                        $facet: {
+                            total_count: [
+                                {
+                                    $group: {
+                                        _id: null,
+                                        count: { $sum: 1 },
+                                    },
+                                },
+                            ],
+                            result: [
+                                {
+                                    $project: {
+                                        __v: 0,
+                                    },
+                                },
+                                { $sort: { createdAt: -1 } },
+                                { $skip: (page - 1) * limit },
+                                { $limit: limit },
+                            ],
                         },
-                      },
-                    ],
-                    result: [
-                      {
-                        $project: {
-                          __v: 0,
+                    },
+                ]);
+                getData = getData[0];
+                if (getData.result.length > 0) {
+                    res({
+                        status: 200,
+                        data: {
+                            total_count: getData.total_count[0].count,
+                            result: getData.result,
                         },
-                      },
-                      { $sort: { createdAt: -1 } },
-                      { $skip: (page - 1) * limit },
-                      { $limit: limit },
-                    ],
-                  },
-                },
-              ]);
-              getData = getData[0];
-              if (getData.result.length > 0) {
-                res({
-                  status: 200,
-                  data: {
-                    total_count: getData.total_count[0].count,
-                    result: getData.result,
-                  },
-                });
-              } else {
-                rej({ status: 404, message: "No data found!!" });
-              }
+                    });
+                } else {
+                    rej({ status: 404, message: "No data found!!" });
+                }
             } catch (err) {
-              console.log(err);
-              rej({ status: 500, error: err, message: "something went wrong!!" });
+                console.log(err);
+                rej({ status: 500, error: err, message: "something went wrong!!" });
             }
-          });
-        }, 
+        });
+    },
+    updateProduct: (_id, data) => {
+        return new Promise(async (res, rej) => {
+            try {
+                let getData = await ProductModel.findByIdAndUpdate(_id, data);
+                if (getData) {
+                    res({ status: 200, data: getData });
+                } else {
+                    rej({ status: 404, message: "no data found" });
+                }
+            } catch (err) {
+                rej({ status: 500, error: err, message: "something went wrong!!" });
+            }
+        })
+    },
 }
 
-  
-  
+
