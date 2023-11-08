@@ -181,7 +181,7 @@ module.exports = {
     updateProduct: (_id, data) => {
         return new Promise(async (res, rej) => {
             try {
-                let getData = await ProductModel.findByIdAndUpdate(_id, data);
+                let getData = await ProductModel.findByIdAndUpdate(_id, data, { new: true });
                 if (getData) {
                     res({ status: 200, data: getData });
                 } else {
