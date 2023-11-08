@@ -63,3 +63,16 @@ exports.getAllSearch = async (req, res) => {
     return response(err.message, err?.error, err.status, res);
   }
 };
+exports.updateProduct = async (req, res) => {
+  try {
+      let resp = await ProductService.updateProduct(req.params._id, req.body);
+      if (resp) {
+          return response("data updated successfully!!", resp.data, 200, res);
+      } else {
+          return response("something went wrong!!", {}, 500, res);
+      }
+
+  } catch (err) {
+      return response(err.message, err?.error, err.status, res);
+  }
+};
