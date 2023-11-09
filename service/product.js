@@ -31,11 +31,12 @@ module.exports = {
     },
     getAllProducts: (req) => {
         return new Promise(async (res, rej) => {
-            // console.log("req", req.user.user_id);
+            console.log("req", req.user.user_id);
             const userId = req.user.user_id
             // console.log("email", email);
             try {
                 let getData;
+                let getdata;
                 let qry = {};
                 let { page, limit } = req.query
                 page = parseInt(page);
@@ -43,8 +44,8 @@ module.exports = {
                 let FindData = await ProductModel.findOne({modifiedBy:userId})
                 // console.log("finddata",FindData);
                 if(FindData){
-                getData = await ProductModel.aggregate([
-                    // { $match: { modifiedBy:{"$nin":[new Mongoose.Types.ObjectId(userId) ]} } },
+                 let data = await ProductModel.aggregate([
+                    { $match: { modifiedBy:{"$nin":[new Mongoose.Types.ObjectId(userId) ]} } },
                     {
                         $facet: {
                             total_count: [
@@ -56,11 +57,11 @@ module.exports = {
                                 }
                             ],
                             result: [
-                                // {
-                                //     $addFields: {
-                                //         "is_visible": true
-                                //     }
-                                // },
+                                {
+                                    $addFields: {
+                                        "is_visible": true
+                                    }
+                                },
                                 {
                                     $project: {
                                         __v: 0,
@@ -73,6 +74,39 @@ module.exports = {
                         }
                     },
                 ]);
+               let Data = await ProductModel.aggregate([
+                    { $match: { modifiedBy:{"$in":[new Mongoose.Types.ObjectId(userId) ]} } },
+                    {
+                        $facet: {
+                            total_count: [
+                                {
+                                    $group: {
+                                        _id: null,
+                                        count: { $sum: 1 }
+                                    }
+                                }
+                            ],
+                            result: [
+                                {
+                                    $project: {
+                                        __v: 0,
+                                    }
+                                },
+                                { $sort: { createdAt: -1 } },
+                                { $skip: (page - 1) * limit },
+                                { $limit: limit }
+                            ]
+                        }
+                    },
+                ]);
+                console.log("data",Data);
+                 const flatdata  =[
+                    data[0].result,
+                    Data[0].result
+                  ]
+                  console.log("flatdata",flatdata);
+                 getdata =flatdata.flat(Infinity);
+                  console.log("getdata",getdata);
                 }else{
                     getData = await ProductModel.aggregate([
                         // { $match: { modifiedBy: new Mongoose.Types.ObjectId(userId) } },
@@ -105,8 +139,13 @@ module.exports = {
                         },
                     ]);
                 }
+                // console.log("getdata",getData[0].result.length);
+                if(getData){
                 getData = getData[0]
-                if (getData.result.length > 0) {
+                }
+                if(FindData){
+                    res({ status: 200, data: { result: getdata } });
+                }else if(getData.result.length > 0) {
                     res({ status: 200, data: { total_count: getData.total_count[0].count, result: getData.result } });
                 }
                 else {
