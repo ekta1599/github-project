@@ -26,7 +26,7 @@ route.put('/updateuser/:_id',usercontroller.update)
 
 //product routes :-
 route.post('/addProduct',auth,productController.AddProduct)
-route.get('/getAllProducts',productController.getAllProducts)
+route.get('/getAllProducts',auth,productController.getAllProducts)
 route.get('/getProductBYId/:_id',productController.getProductBYId)
 route.delete('/delteProductByID/:_id',productController.deleteProductByID)
 route.get('/getAllSearch',auth,productController.getAllSearch)

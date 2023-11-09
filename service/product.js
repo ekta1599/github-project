@@ -31,7 +31,7 @@ module.exports = {
     getAllProducts: (req) => {
         return new Promise(async (res, rej) => {
             // console.log("req", req.user.user_id);
-            // const userId = req.user.user_id
+            const userId = req.user.user_id
             // console.log("email", email);
 
             try {
@@ -47,7 +47,7 @@ module.exports = {
                 //     rej({ status: 404, message: "No data found!!" })
                 // } else {
                 getData = await ProductModel.aggregate([
-                    // { $match: { userId:new Mongoose.Types.ObjectId(userId) } },
+                    { $match: { userId:new Mongoose.Types.ObjectId(userId) } },
                     {
                         $facet: {
                             total_count: [
