@@ -1,5 +1,6 @@
 const ProductModel = require('../model/Product')
 var Mongoose = require('mongoose');
+const UserModel = require('../model/User')
 
 module.exports = {
     AddProduct: (req) => {
@@ -33,21 +34,17 @@ module.exports = {
             // console.log("req", req.user.user_id);
             const userId = req.user.user_id
             // console.log("email", email);
-
             try {
                 let getData;
                 let qry = {};
                 let { page, limit } = req.query
                 page = parseInt(page);
                 limit = parseInt(limit);
-
-                // let userdata = await UserModel.findOne({ "email": email })
-                // console.log("userdata", userdata);
-                // if (!userdata) {
-                //     rej({ status: 404, message: "No data found!!" })
-                // } else {
+                let FindData = await ProductModel.findOne({modifiedBy:userId})
+                // console.log("finddata",FindData);
+                if(FindData){
                 getData = await ProductModel.aggregate([
-                    { $match: { userId:new Mongoose.Types.ObjectId(userId) } },
+                    // { $match: { modifiedBy:{"$nin":[new Mongoose.Types.ObjectId(userId) ]} } },
                     {
                         $facet: {
                             total_count: [
@@ -59,6 +56,11 @@ module.exports = {
                                 }
                             ],
                             result: [
+                                // {
+                                //     $addFields: {
+                                //         "is_visible": true
+                                //     }
+                                // },
                                 {
                                     $project: {
                                         __v: 0,
@@ -71,7 +73,38 @@ module.exports = {
                         }
                     },
                 ]);
-                // }
+                }else{
+                    getData = await ProductModel.aggregate([
+                        // { $match: { modifiedBy: new Mongoose.Types.ObjectId(userId) } },
+                        {
+                            $facet: {
+                                total_count: [
+                                    {
+                                        $group: {
+                                            _id: null,
+                                            count: { $sum: 1 }
+                                        }
+                                    }
+                                ],
+                                result: [
+                                    {
+                                        $addFields: {
+                                            "is_visible": true
+                                        }
+                                    },
+                                    {
+                                        $project: {
+                                            __v: 0,
+                                        }
+                                    },
+                                    { $sort: { createdAt: -1 } },
+                                    { $skip: (page - 1) * limit },
+                                    { $limit: limit }
+                                ]
+                            }
+                        },
+                    ]);
+                }
                 getData = getData[0]
                 if (getData.result.length > 0) {
                     res({ status: 200, data: { total_count: getData.total_count[0].count, result: getData.result } });
@@ -236,16 +269,37 @@ module.exports = {
             }
         });
     },
-    updateProduct: (_id, data) => {
+    // updateProduct: (_id, data) => {
+    //     return new Promise(async (res, rej) => {
+    //         try {
+    //             let getData = await ProductModel.findByIdAndUpdate(_id, data, { new: true });
+    //             if (getData) {
+    //                 res({ status: 200, data: getData });
+    //             } else {
+    //                 rej({ status: 404, message: "no data found" });
+    //             }
+    //         } catch (err) {
+    //             rej({ status: 500, error: err, message: "something went wrong!!" });
+    //         }
+    //     })
+    // },
+    updateProduct: (req) => {
         return new Promise(async (res, rej) => {
             try {
-                let getData = await ProductModel.findByIdAndUpdate(_id, data, { new: true });
+                const userId = req.user.user_id
+                const { _id } = req.params
+                req.body['modifiedBy'] = new Mongoose.Types.ObjectId(userId)
+                let getData = await ProductModel.findByIdAndUpdate({ _id: new Mongoose.Types.ObjectId(_id) }, { $set: req.body },
+                    {
+                        new: true,
+                    });
                 if (getData) {
                     res({ status: 200, data: getData });
                 } else {
                     rej({ status: 404, message: "no data found" });
                 }
             } catch (err) {
+                console.log("err", err);
                 rej({ status: 500, error: err, message: "something went wrong!!" });
             }
         })

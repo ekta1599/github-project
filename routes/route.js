@@ -31,7 +31,7 @@ route.get('/getAllPRODUCT',productController.getAllPRODUCT)
 route.get('/getProductBYId/:_id',productController.getProductBYId)
 route.delete('/delteProductByID/:_id',productController.deleteProductByID)
 route.get('/getAllSearch',auth,productController.getAllSearch)
-route.put('/updateProduct/:_id',productController.updateProduct)
+route.put('/updateProduct/:_id',auth,productController.updateProduct)
 //login && registration
 route.post("/register", async (req, res) => {
     try {

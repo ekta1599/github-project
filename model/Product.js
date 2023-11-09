@@ -25,6 +25,9 @@ let ProductModel = new Schema(
         },
         userId:{
             type:Types.ObjectId
+        },
+        modifiedBy:{
+            type:Types.ObjectId
         }
     },
     { timestamps: true }
