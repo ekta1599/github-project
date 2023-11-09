@@ -86,6 +86,64 @@ module.exports = {
             }
         });
     },
+    getAllPRODUCT: (req) => {
+        return new Promise(async (res, rej) => {
+            // console.log("req", req.user.user_id);
+            // const userId = req.user.user_id
+            // console.log("email", email);
+
+            try {
+                let getData;
+                let qry = {};
+                let { page, limit } = req.query
+                page = parseInt(page);
+                limit = parseInt(limit);
+
+                // let userdata = await UserModel.findOne({ "email": email })
+                // console.log("userdata", userdata);
+                // if (!userdata) {
+                //     rej({ status: 404, message: "No data found!!" })
+                // } else {
+                getData = await ProductModel.aggregate([
+                    // { $match: { userId:new Mongoose.Types.ObjectId(userId) } },
+                    {
+                        $facet: {
+                            total_count: [
+                                {
+                                    $group: {
+                                        _id: null,
+                                        count: { $sum: 1 }
+                                    }
+                                }
+                            ],
+                            result: [
+                                {
+                                    $project: {
+                                        __v: 0,
+                                    }
+                                },
+                                { $sort: { createdAt: -1 } },
+                                { $skip: (page - 1) * limit },
+                                { $limit: limit }
+                            ]
+                        }
+                    },
+                ]);
+                // }
+                getData = getData[0]
+                if (getData.result.length > 0) {
+                    res({ status: 200, data: { total_count: getData.total_count[0].count, result: getData.result } });
+                }
+                else {
+                    rej({ status: 404, message: "No data found!!" });
+                }
+            }
+            catch (err) {
+                console.log(err)
+                rej({ status: 500, error: err, message: "something went wrong!!" });
+            }
+        });
+    },
     getProductBYId: (_id) => {
         return new Promise(async (res, rej) => {
             try {
