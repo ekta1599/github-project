@@ -25,6 +25,19 @@ exports.getAllProducts = async (req, res) => {
     return response(err.message, err?.error, err.status, res);
   }
 };
+exports.getAllPRODUCT = async (req, res) => {
+  try {
+      if (!req.query.page || !req.query.limit) {
+          return response("pagination is require for pagination..!!", {}, 404, res);
+      }
+      let resp = await ProductService.getAllPRODUCT(req);
+      if (resp) {
+        return response("SUCCESS..!!", resp.data, 200, res);
+      } else return response("Error..!!", err.error, err.status, res);
+  } catch (err) {
+    return response(err.message, err?.error, err.status, res);
+  }
+};
 exports.getProductBYId = async (req, res) => {
   try {
     let resp = await ProductService.getProductBYId(req.params._id);
