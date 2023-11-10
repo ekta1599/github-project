@@ -254,7 +254,7 @@ module.exports = {
                 let { page, limit, str } = req.query
                 console.log("str", str);
                 let qry = {};
-                qry.userId = new Mongoose.Types.ObjectId(userID)
+                // qry.userId = new Mongoose.Types.ObjectId(userID)
                 page = parseInt(page);
                 limit = parseInt(limit);
                 //   if (str) {
