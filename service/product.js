@@ -67,7 +67,7 @@ module.exports = {
                                         __v: 0,
                                     }
                                 },
-                                { $sort: { createdAt: -1 } },
+                                // { $sort: { createdAt: -1 } },
                                 { $skip: (page - 1) * limit },
                                 { $limit: limit }
                             ]
@@ -92,7 +92,7 @@ module.exports = {
                                         __v: 0,
                                     }
                                 },
-                                { $sort: { createdAt: -1 } },
+                                // { $sort: { createdAt: -1 } },
                                 { $skip: (page - 1) * limit },
                                 { $limit: limit }
                             ]
@@ -131,7 +131,7 @@ module.exports = {
                                             __v: 0,
                                         }
                                     },
-                                    { $sort: { createdAt: -1 } },
+                                    // { $sort: { createdAt: -1 } },
                                     { $skip: (page - 1) * limit },
                                     { $limit: limit }
                                 ]
