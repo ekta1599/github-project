@@ -250,11 +250,11 @@ module.exports = {
         return new Promise(async (res, rej) => {
             try {
                 let userID = req.user.user_id;
-
+                console.log("userid",userID);
                 let { page, limit, str } = req.query
                 console.log("str", str);
                 let qry = {};
-                // qry.userId = new Mongoose.Types.ObjectId(userID)
+                qry.modifiedBy = new Mongoose.Types.ObjectId(userID)
                 page = parseInt(page);
                 limit = parseInt(limit);
                 //   if (str) {
