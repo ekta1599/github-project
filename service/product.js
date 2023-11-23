@@ -41,73 +41,73 @@ module.exports = {
                 let { page, limit } = req.query
                 page = parseInt(page);
                 limit = parseInt(limit);
-                let FindData = await ProductModel.findOne({modifiedBy : userId})
+                let FindData = await ProductModel.findOne({ modifiedBy: userId })
                 // console.log("finddata",FindData);
-                if(FindData){
-                 let data = await ProductModel.aggregate([
-                    { $match: { modifiedBy:{"$nin":[new Mongoose.Types.ObjectId(userId) ]} } },
-                    {
-                        $facet: {
-                            total_count: [
-                                {
-                                    $group: {
-                                        _id: null,
-                                        count: { $sum: 1 }
+                if (FindData) {
+                    let data = await ProductModel.aggregate([
+                        { $match: { modifiedBy: { "$nin": [new Mongoose.Types.ObjectId(userId)] } } },
+                        {
+                            $facet: {
+                                total_count: [
+                                    {
+                                        $group: {
+                                            _id: null,
+                                            count: { $sum: 1 }
+                                        }
                                     }
-                                }
-                            ],
-                            result: [
-                                {
-                                    $addFields: {
-                                        "is_visible": true
+                                ],
+                                result: [
+                                    {
+                                        $addFields: {
+                                            "is_visible": true
+                                        }
+                                    },
+                                    {
+                                        $project: {
+                                            __v: 0,
+                                        }
+                                    },
+                                    // { $sort: { createdAt: -1 } },
+                                    { $skip: (page - 1) * limit },
+                                    { $limit: limit }
+                                ]
+                            }
+                        },
+                    ]);
+                    let Data = await ProductModel.aggregate([
+                        { $match: { modifiedBy: { "$in": [new Mongoose.Types.ObjectId(userId)] } } },
+                        {
+                            $facet: {
+                                total_count: [
+                                    {
+                                        $group: {
+                                            _id: null,
+                                            count: { $sum: 1 }
+                                        }
                                     }
-                                },
-                                {
-                                    $project: {
-                                        __v: 0,
-                                    }
-                                },
-                                // { $sort: { createdAt: -1 } },
-                                { $skip: (page - 1) * limit },
-                                { $limit: limit }
-                            ]
-                        }
-                    },
-                ]);
-               let Data = await ProductModel.aggregate([
-                    { $match: { modifiedBy:{"$in":[new Mongoose.Types.ObjectId(userId) ]} } },
-                    {
-                        $facet: {
-                            total_count: [
-                                {
-                                    $group: {
-                                        _id: null,
-                                        count: { $sum: 1 }
-                                    }
-                                }
-                            ],
-                            result: [
-                                {
-                                    $project: {
-                                        __v: 0,
-                                    }
-                                },
-                                // { $sort: { createdAt: -1 } },
-                                { $skip: (page - 1) * limit },
-                                { $limit: limit }
-                            ]
-                        }
-                    },
-                ]);
-                console.log("data",Data);
-                 const flatdata  =[
-                    data[0].result,
-                    Data[0].result
-                  ]
-                  console.log("flatdata",flatdata);
-                 getdata =flatdata.flat(Infinity);
-                  console.log("getdata",getdata);
-                }else{
+                                ],
+                                result: [
+                                    {
+                                        $project: {
+                                            __v: 0,
+                                        }
+                                    },
+                                    // { $sort: { createdAt: -1 } },
+                                    { $skip: (page - 1) * limit },
+                                    { $limit: limit }
+                                ]
+                            }
+                        },
+                    ]);
+                    console.log("data", Data);
+                    const flatdata = [
+                        data[0].result,
+                        Data[0].result
+                    ]
+                    console.log("flatdata", flatdata);
+                    getdata = flatdata.flat(Infinity);
+                    console.log("getdata", getdata);
+                } else {
                     getData = await ProductModel.aggregate([
                         // { $match: { modifiedBy: new Mongoose.Types.ObjectId(userId) } },
                         {
@@ -140,12 +140,12 @@ module.exports = {
                     ]);
                 }
                 // console.log("getdata",getData[0].result.length);
-                if(getData){
-                getData = getData[0]
+                if (getData) {
+                    getData = getData[0]
                 }
-                if(FindData){
+                if (FindData) {
                     res({ status: 200, data: { result: getdata } });
-                }else if(getData.result.length > 0) {
+                } else if (getData.result.length > 0) {
                     res({ status: 200, data: { total_count: getData.total_count[0].count, result: getData.result } });
                 }
                 else {
@@ -250,7 +250,7 @@ module.exports = {
         return new Promise(async (res, rej) => {
             try {
                 let userID = req.user.user_id;
-                console.log("userid",userID);
+                console.log("userid", userID);
                 let { page, limit, str } = req.query
                 console.log("str", str);
                 let qry = {};
@@ -308,7 +308,7 @@ module.exports = {
             }
         });
     },
-   
+
     updateProduct: (req) => {
         return new Promise(async (res, rej) => {
             try {
@@ -330,6 +330,91 @@ module.exports = {
             }
         })
     },
+
+    likedBy: async (req) => {
+        try {
+            const userId = req.user.user_id;
+            const { _id } = req.params;
+            req.body['modifiedBy'] = new Mongoose.Types.ObjectId(userId);
+    
+            const product = await ProductModel.findById(_id);
+            const userAlreadyLiked = product.likedBy.some((like) => like.user_id.toString() === userId);
+    
+            if (!userAlreadyLiked) {
+                let getData = await ProductModel.findByIdAndUpdate(
+                    { _id: new Mongoose.Types.ObjectId(_id) },
+                    {
+                        $addToSet: {
+                            likedBy: {
+                                user_id: userId,
+                            },
+                        },
+                        $pull: {
+                            DislikedBy: {
+                                user_id: userId,
+                            },
+                        },
+                    },
+                    {
+                        new: true,
+                    }
+                );
+    
+                if (getData) {
+                    return { status: 200, data: getData };
+                } else {
+                    return { status: 404, message: "No data found" };
+                }
+            } else {
+                return { status: 200, data: product };
+            }
+        } catch (err) {
+            console.log("err", err);
+            return { status: 500, error: err, message: "Something went wrong!!" };
+        }
+    },
+    DislikedBy: (req) => {
+        return new Promise(async (res, rej) => {
+            try {
+                const userId = req.user.user_id;
+                const { _id } = req.params;
+                req.body['modifiedBy'] = new Mongoose.Types.ObjectId(userId);
+
+                const product = await ProductModel.findById(_id);
+                const userAlreadyLiked = product.DislikedBy.some((like) => like.user_id.toString() === userId);
+                if (!userAlreadyLiked) {
+                    let getData = await ProductModel.findByIdAndUpdate(
+                        { _id: new Mongoose.Types.ObjectId(_id) },
+                        {
+                            $addToSet: {
+                                DislikedBy: {
+                                    user_id: userId,
+                                },
+                            },
+                            $pull: {
+                                likedBy: {
+                                    user_id: userId,
+                                },
+                            },
+                        },
+                        {
+                            new: true,
+                        }
+                    );
+
+                    if (getData) {
+                        res({ status: 200, data: getData });
+                    } else {
+                        rej({ status: 404, message: "no data found" });
+                    }
+                } else {
+                    res({ status: 200, data: product });
+                }
+            } catch (err) {
+                console.log("err", err);
+                rej({ status: 500, error: err, message: "something went wrong!!" });
+            }
+        });
+    },
+
 }
-
-

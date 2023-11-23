@@ -102,3 +102,29 @@ exports.updateProduct = async (req, res) => {
       return response(err.message, err?.error, err.status, res);
   }
 };
+exports.likedBy = async (req, res) => {
+  try {
+      let resp = await ProductService.likedBy(req);
+      if (resp) {
+          return response("data updated successfully!!", resp.data, 200, res);
+      } else {
+          return response("something went wrong!!", {}, 500, res);
+      }
+
+  } catch (err) {
+      return response(err.message, err?.error, err.status, res);
+  }
+};
+exports.DislikedBy = async (req, res) => {
+  try {
+      let resp = await ProductService.DislikedBy(req);
+      if (resp) {
+          return response("data updated successfully!!", resp.data, 200, res);
+      } else {
+          return response("something went wrong!!", {}, 500, res);
+      }
+
+  } catch (err) {
+      return response(err.message, err?.error, err.status, res);
+  }
+};

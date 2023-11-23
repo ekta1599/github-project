@@ -12,23 +12,35 @@ let ProductModel = new Schema(
         },
         Price: {
             type: Number,
-            default:null
+            default: null
         },
         Weight: {
             type: Number,
-            default:null
+            default: null
         },
         Is_fav: {
             type: Boolean,
-            default:false,
-            enum:[true,false]
+            default: false,
+            enum: [true, false]
         },
-        userId:{
-            type:Types.ObjectId
+        userId: {
+            type: Types.ObjectId
         },
-        modifiedBy:{
-            type:Types.ObjectId
-        }
+        likedBy: [
+            {
+                user_id: {
+                    type: Types.ObjectId,
+                    ref: 'User',
+                },
+            }
+        ],
+
+        DislikedBy: [{
+            user_id: {
+                type: Types.ObjectId,
+                ref: 'User',
+            },
+        }]
     },
     { timestamps: true }
 );

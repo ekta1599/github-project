@@ -29,6 +29,7 @@ module.exports = {
             }
         })
     },
+    
     delete: (_id) => {
         return new Promise(async (res, rej) => {
             try {
