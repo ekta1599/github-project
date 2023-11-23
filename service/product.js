@@ -41,7 +41,7 @@ module.exports = {
                 let { page, limit } = req.query
                 page = parseInt(page);
                 limit = parseInt(limit);
-                let FindData = await ProductModel.findOne({modifiedBy:userId})
+                let FindData = await ProductModel.findOne({modifiedBy : userId})
                 // console.log("finddata",FindData);
                 if(FindData){
                  let data = await ProductModel.aggregate([
@@ -308,20 +308,7 @@ module.exports = {
             }
         });
     },
-    // updateProduct: (_id, data) => {
-    //     return new Promise(async (res, rej) => {
-    //         try {
-    //             let getData = await ProductModel.findByIdAndUpdate(_id, data, { new: true });
-    //             if (getData) {
-    //                 res({ status: 200, data: getData });
-    //             } else {
-    //                 rej({ status: 404, message: "no data found" });
-    //             }
-    //         } catch (err) {
-    //             rej({ status: 500, error: err, message: "something went wrong!!" });
-    //         }
-    //     })
-    // },
+   
     updateProduct: (req) => {
         return new Promise(async (res, rej) => {
             try {

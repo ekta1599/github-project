@@ -34,7 +34,7 @@ module.exports = {
         return new Promise(async (res, rej) => {
             console.log("req", req.user.user_id);
             const userId = req.user.user_id
-            // console.log("email", email);
+            console.log("email", userId);
 
             try {
                 let getData;
@@ -43,13 +43,8 @@ module.exports = {
                 page = parseInt(page);
                 limit = parseInt(limit);
 
-                // let userdata = await UserModel.findOne({ "email": email })
-                // console.log("userdata", userdata);
-                // if (!userdata) {
-                //     rej({ status: 404, message: "No data found!!" })
-                // } else {
-                getData = await UserdetailModel.aggregate([
-                    { $match: { userId:new Mongoose.Types.ObjectId(userId) } },
+                getData = await UserModel.aggregate([
+                    // { $match: { userId:new Mongoose.Types.ObjectId(userId) } },
                     {
                         $facet: {
                             total_count: [

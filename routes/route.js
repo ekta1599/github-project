@@ -95,9 +95,16 @@ route.post("/login", async (req, res) => {
             expiresIn: "2h",
           }
         );
-  
-    
+        const refreshtoken = jwt.sign(
+          { user_id: user._id, email },
+          process.env.TOKEN_KEY,
+          {
+            expiresIn: "2h",
+          }
+        );
+        console.log("refreshtoken",token);
         user.token = token;
+        user.refreshtoken = refreshtoken
   
         res.status(200).json(user);
       }
