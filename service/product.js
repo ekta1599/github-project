@@ -252,9 +252,9 @@ module.exports = {
                 let userID = req.user.user_id;
                 console.log("userid", userID);
                 let { page, limit, str } = req.query
-                console.log("str", str);
+                // console.log("str", str);
                 let qry = {};
-                qry.modifiedBy = new Mongoose.Types.ObjectId(userID)
+                // qry.modifiedBy = new Mongoose.Types.ObjectId(userID)
                 page = parseInt(page);
                 limit = parseInt(limit);
                 //   if (str) {
@@ -266,7 +266,7 @@ module.exports = {
                 console.log("qry..............", qry);
                 let getData = await ProductModel.aggregate([
                     { $match: qry },
-                    // {$match : {'userId': new Mongoose.Types.ObjectId(userID)}},
+                    {$match : {'likedBy.user_id': new Mongoose.Types.ObjectId(userID)}},
                     {
                         $facet: {
                             total_count: [
@@ -331,35 +331,81 @@ module.exports = {
         })
     },
 
+    // likedBy: async (req) => {
+    //     try {
+    //         const userId = req.user.user_id;
+    //         const { _id } = req.params;
+    //         req.body['modifiedBy'] = new Mongoose.Types.ObjectId(userId);
+
+    //         const product = await ProductModel.findById(_id);
+    //         const userAlreadyLiked = product.likedBy.some((like) => like.user_id.toString() === userId);
+
+    //         if (!userAlreadyLiked) {
+    //             let getData = await ProductModel.findByIdAndUpdate(
+    //                 { _id: new Mongoose.Types.ObjectId(_id) },
+
+    //                 {
+    //                     $addToSet: {
+    //                         likedBy: {
+    //                             user_id: userId,
+    //                         },
+    //                     },
+    //                     $pull: {
+    //                         DislikedBy: {
+    //                             user_id: userId,
+    //                         },
+    //                     },
+    //                 },
+    //                  { $set: req.body },
+    //                 {
+    //                     new: true,
+    //                 }
+    //             );
+
+    //             if (getData) {
+    //                 return { status: 200, data: getData };
+    //             } else {
+    //                 return { status: 404, message: "No data found" };
+    //             }
+    //         } else {
+    //             return { status: 200, data: product };
+    //         }
+    //     } catch (err) {
+    //         console.log("err", err);
+    //         return { status: 500, error: err, message: "Something went wrong!!" };
+    //     }
+    // },
+
     likedBy: async (req) => {
         try {
             const userId = req.user.user_id;
             const { _id } = req.params;
-            req.body['modifiedBy'] = new Mongoose.Types.ObjectId(userId);
-    
+
             const product = await ProductModel.findById(_id);
             const userAlreadyLiked = product.likedBy.some((like) => like.user_id.toString() === userId);
-    
+
+            const updateObj = {
+                $addToSet: {
+                    likedBy: {
+                        user_id: userId,
+                    },
+                },
+                $pull: {
+                    DislikedBy: {
+                        user_id: userId,
+                    },
+                },
+                ...req.body
+            };
             if (!userAlreadyLiked) {
                 let getData = await ProductModel.findByIdAndUpdate(
                     { _id: new Mongoose.Types.ObjectId(_id) },
-                    {
-                        $addToSet: {
-                            likedBy: {
-                                user_id: userId,
-                            },
-                        },
-                        $pull: {
-                            DislikedBy: {
-                                user_id: userId,
-                            },
-                        },
-                    },
+                    updateObj,
                     {
                         new: true,
                     }
                 );
-    
+
                 if (getData) {
                     return { status: 200, data: getData };
                 } else {
@@ -373,6 +419,7 @@ module.exports = {
             return { status: 500, error: err, message: "Something went wrong!!" };
         }
     },
+
     DislikedBy: (req) => {
         return new Promise(async (res, rej) => {
             try {
