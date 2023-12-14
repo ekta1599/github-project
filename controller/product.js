@@ -25,19 +25,7 @@ exports.getAllProducts = async (req, res) => {
     return response(err.message, err?.error, err.status, res);
   }
 };
-// exports.getAllPRODUCT = async (req, res) => {
-//   try {
-//       if (!req.query.page || !req.query.limit) {
-//           return response("pagination is require for pagination..!!", {}, 404, res);
-//       }
-//       let resp = await ProductService.getAllPRODUCT(req);
-//       if (resp) {
-//         return response("SUCCESS..!!", resp.data, 200, res);
-//       } else return response("Error..!!", err.error, err.status, res);
-//   } catch (err) {
-//     return response(err.message, err?.error, err.status, res);
-//   }
-// };
+
 exports.getProductBYId = async (req, res) => {
   try {
     let resp = await ProductService.getProductBYId(req.params._id);
@@ -51,18 +39,7 @@ exports.getProductBYId = async (req, res) => {
     return response(err.message, err?.error, err.status, res);
   }
 };
-// exports.deleteProductByID = async (req, res) => {
-//   try {
-//       let resp = await ProductService.deleteProductByID(req.params._id);
-//       if (resp) {
-//           return response("Deleted successfully!!", resp.data, 200, res);
-//       } else {
-//           return response("Error..!!", err.error, err.status, res);
-//       }
-//   } catch (err) {
-//       return response(err.message, err?.error, err.status, res);
-//   }
-// };
+
 exports.getAllSearch = async (req, res) => {
   try {
       if (!req.query.page || !req.query.limit) {
@@ -77,19 +54,6 @@ exports.getAllSearch = async (req, res) => {
   }
 };
 
-// exports.updateProduct = async (req, res) => {
-//   try {
-//       let resp = await ProductService.updateProduct(req);
-//       if (resp) {
-//           return response("data updated successfully!!", resp.data, 200, res);
-//       } else {
-//           return response("something went wrong!!", {}, 500, res);
-//       }
-
-//   } catch (err) {
-//       return response(err.message, err?.error, err.status, res);
-//   }
-// };
 exports.likedBy = async (req, res) => {
   try {
       let resp = await ProductService.likedBy(req);
