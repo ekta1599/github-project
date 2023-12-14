@@ -5,6 +5,7 @@ const route = router()
 const controller = require('../controller/controller')
 const usercontroller = require('../controller/userdetail')
 const productController = require('../controller/product.js')
+const CartController = require('../controller/cart.js')
 const {response} = require('../middleware/response')
 const UserModel = require('../model/User')
 const auth = require('../middleware/auth')
@@ -27,13 +28,19 @@ route.put('/updateuser/:_id',usercontroller.update)
 //product routes :-
 route.post('/addProduct',auth,productController.AddProduct)
 route.get('/getAllProducts',auth,productController.getAllProducts)
-// route.get('/getAllPRODUCT',productController.getAllPRODUCT)
 route.get('/getProductBYId/:_id',productController.getProductBYId)
-// route.delete('/delteProductByID/:_id',productController.deleteProductByID)
 route.get('/getAllSearch',auth,productController.getAllSearch)
-// route.put('/updateProduct/:_id',auth,productController.updateProduct)
 route.put('/likedBy/:_id',auth,productController.likedBy)
 route.put('/DislikedBy/:_id',auth,productController.DislikedBy)
+
+//add to cart:-
+route.post('/addCart',auth,CartController.addCart)
+route.get('/getAllCart',auth,CartController.getAllCart)
+route.get('/getCartBYId/:_id',CartController.getCartBYId)
+route.put('/AddedBy/:_id',auth,CartController.AddedBy)
+route.put('/RemovedBy/:_id',auth,CartController.RemovedBy)
+route.get('/getAllUserCart',auth,CartController.getAllUserCart)
+
 //login && registration
 route.post("/register", async (req, res) => {
     try {
